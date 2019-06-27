@@ -1,0 +1,11 @@
+FROM php:7.3-apache
+RUN apt-get update
+RUN apt-get install -y libicu-dev libxml2-dev
+RUN docker-php-ext-install pdo_mysql mbstring intl simplexml && \
+    echo 'error_reporting = E_ALL' >> /usr/local/etc/php/conf.d/99_mysqlconf.ini && \
+    echo 'date.timezone = Asia/Tokyo' >> /usr/local/etc/php/conf.d/99_mysqlconf.ini && \
+    a2enmod rewrite
+RUN sed -i 's/<\/VirtualHost>/\n\t<Directory \/var\/www\/html>\n\t\tOptions FollowSymLinks\n\t\tAllowOverride All\n\t\tRequire all granted\n\t<\/Directory>\n<\/VirtualHost>/g' /etc/apache2/sites-available/000-default.conf
+
+# composerインストール
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer

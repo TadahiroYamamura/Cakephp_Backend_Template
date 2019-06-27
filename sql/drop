@@ -1,0 +1,17 @@
+DROP TABLE IF EXISTS `features`;
+DROP TABLE IF EXISTS `faqs`;
+DROP TABLE IF EXISTS `faq_categories`;
+DROP TABLE IF EXISTS `contacts`;
+DROP TABLE IF EXISTS `apply_details`;
+DROP TABLE IF EXISTS `applies`;
+DROP TABLE IF EXISTS `favorites`;
+DROP TABLE IF EXISTS `jobs_skills`;
+DROP TABLE IF EXISTS `skills`;
+DROP TABLE IF EXISTS `skill_categories`;
+DROP TABLE IF EXISTS `job_details`;
+DROP TABLE IF EXISTS `jobs`;
+DROP TABLE IF EXISTS `job_categories`;
+DROP TABLE IF EXISTS `profile_details`;
+DROP TABLE IF EXISTS `profiles`;
+DROP TABLE IF EXISTS `users`;
+DROP TABLE IF EXISTS `area_names`;
