@@ -255,9 +255,9 @@ return [
              * the following line and set the port accordingly
              */
             //'port' => 'non_standard_port_number',
-            'username' => 'my_app',
-            'password' => 'secret',
-            'database' => 'my_app',
+            'username' => env("MYSQL_USER"),
+            'password' => env("MYSQL_PASSWORD"),
+            'database' => env("MYSQL_DATABASE"),
             /*
              * You do not need to set this flag to use full utf-8 encoding (internal default since CakePHP 3.6).
              */
