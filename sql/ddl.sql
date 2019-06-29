@@ -94,6 +94,7 @@ CREATE TABLE `job_details` (
 
 CREATE TABLE `skill_categories` (
   `id` int(11) unsigned primary key,
+  `key` varchar(31) not null unique,
   `name` varchar(50) not null unique
 );
 
@@ -248,13 +249,13 @@ insert into job_categories (id, sort, name) values
 (2, 2, '営業・その他');
 
 
-insert into skill_categories(id, name) values
-(1, '開発言語'),
-(2, '役割'),
-(3, 'スキル'),
-(4, '条件'),
-(5, 'デザイン'),
-(6, '営業');
+insert into skill_categories(`id`, `key`, `name`) values
+(1, 'language', '開発言語'),
+(2, 'role', '役割'),
+(3, 'skill', 'スキル'),
+(4, 'condition', '条件'),
+(5, 'design', 'デザイン'),
+(6, 'sales', '営業');
 
 
 

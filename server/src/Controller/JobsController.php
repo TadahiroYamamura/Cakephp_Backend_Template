@@ -119,7 +119,32 @@ class JobsController extends AppController
 
     public function queryJobs() {
         $this->autoRender = false;
-        $this->response->withType("application/json");
-        $this->response->body(json_encode($this->Jobs->queryJobs(null), JSON_UNESCAPED_UNICODE));
+        $params = $this->request->getQueryParams();
+        $arg = [];
+
+        $user = $this->Auth->user();
+
+        // skill parameters
+        $skills = [];
+        foreach (["language", "role", "skill", "condition", "design", "sales"] as $key) {
+            if (!isset($params[$key])) continue;
+            $skills[$key] = explode(",", $params[$key]);
+        }
+        if (count($skills) > 0) $arg["skill"] = $skills;
+
+        // area parameters
+        if (isset($params["area"])) $arg["area"] = $params["area"];
+
+        // salary parameter
+        if (isset($params["salary"])) $arg["salary"] = $params["salary"];
+
+        // free word
+        if (isset($params["word"])) {
+            $arg["word"] = preg_split("/\s/", mb_convert_kana($params["word"], "s"), null, PREG_SPLIT_NO_EMPTY);
+        }
+
+        return $this->response
+            ->withType("application/json")
+            ->withStringBody(json_encode($this->Jobs->queryJobs($arg, $user), JSON_UNESCAPED_UNICODE));
     }
 }

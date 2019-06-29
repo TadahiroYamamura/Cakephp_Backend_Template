@@ -4,6 +4,7 @@ namespace App\Model\Table;
 use Cake\ORM\Query;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
+use Cake\ORM\TableRegistry;
 use Cake\Validation\Validator;
 
 /**
@@ -175,9 +176,77 @@ class JobsTable extends Table
         return $rules;
     }
 
-    public function queryJobs($options) {
-        return $this->find()
-          ->contain(["JobCategories", "AreaNames"])
-          ->all();
+    public function queryJobs($args, $user) {
+        $query = $this->find();
+
+        // join tables
+        $tables = [];
+        $tables[] = "JobCategories";
+        $tables[] = "AreaNames";
+        $tables[] = "Skills";
+        if (!is_null($user)) $tables[] = [
+            "Favorites" => [
+                "fields" => ["job_id"],
+                "conditions" => ["user_id" => $user["id"]],
+            ]
+        ];
+        $query->contain($tables);
+
+        $query->where([
+            "display_flg" => 1,
+            "NOW() between start_date and expire_date",
+        ]);
+
+        if (isset($args["skill"])) {
+            // query SkillCategories
+            $categories = [];
+            foreach (TableRegistry::getTableLocator()->get("SkillCategories")->find() as $c) {
+                $this->filterBySkill($query, $args["skill"], $c["id"], $c["key"]);
+            }
+        }
+
+        if (isset($args["area"])) {
+            $query->where([
+                "prefecture" => $args["area"],
+            ]);
+        }
+
+        if (isset($args["salary"])) {
+            $query->where([
+                "salary_minimum >= " => $args["salary"],
+            ]);
+        }
+
+        if (isset($args["word"])) {
+            $cols = ["hiring_company", "job_title", "job_type", "job_description", "requirement", "address", "street"];
+            foreach ($args["word"] as $word) {
+                $query->where([
+                    "OR" => array_map(function($c) use($word) { return ["$c like" => "%$word%"]; }, $cols),
+                ]);
+            }
+        }
+
+        // remove duplication by ID
+        $tmp = [];
+        $buf = [];
+        foreach ($query as $res) {
+            $id = $res["id"];
+            if (in_array($id, $tmp)) continue;
+            $tmp[] = $id;
+            $buf[] = $res;
+        }
+        return $buf;
+    }
+
+    private function filterBySkill($query, $options, $category_id, $key) {
+        return $query->matching("Skills", function($q) use($options, $category_id, $key) {
+            if (isset($options[$key])) {
+                return $q->where([
+                    "Skills.skill_category_id" => $category_id,
+                    "Skills.name in" => $options[$key],
+                ]);
+            }
+            return $q;
+        });
     }
 }
